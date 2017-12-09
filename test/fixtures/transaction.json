@@ -1,0 +1,24 @@
+[
+    {
+        "reference": "2214",
+        "user": 7,
+        "ip": "192.168.0.1",
+        "flutterChargeReference": "FFV1234",
+        "flutterChargeResponseCode": "200",
+        "flutterChargeResponseMessage": "A message to all",
+        "beneficiaryName": "Kumbi Adamu Chukwudi",
+        "beneficiaryAccountNumber": "069000005",
+        "beneficiaryBankCode": "064",
+        "merchantCommission": "15",
+        "meta": "{type: 'string'}",
+        "moneywaveCommission": "80",
+        "netDebitAmount": "1095",
+        "amount": "1000",
+        "chargeCurrency": "NGN",
+        "chargedFee": "95",
+        "source": "card",
+        "status": "started",
+        "type": "transfer",
+        "disburseCurrency": "NGN"
+    }
+]

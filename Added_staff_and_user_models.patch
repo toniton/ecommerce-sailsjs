@@ -1,0 +1,104 @@
+Index: api/controllers/StaffController.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- api/controllers/StaffController.js	(revision )
++++ api/controllers/StaffController.js	(revision )
+@@ -0,0 +1,11 @@
++/**
++ * StaffController
++ *
++ * @description :: Server-side logic for managing Staff
++ * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
++ */
++
++module.exports = {
++	
++};
++
+Index: api/controllers/UserController.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- api/controllers/UserController.js	(revision )
++++ api/controllers/UserController.js	(revision )
+@@ -0,0 +1,11 @@
++/**
++ * UserController
++ *
++ * @description :: Server-side logic for managing Users
++ * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
++ */
++
++module.exports = {
++	
++};
++
+Index: api/models/Artisan.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- api/models/Artisan.js	(revision 5fd9e68bfa709ea980bf066bfca480b65736b4cc)
++++ api/models/Artisan.js	(revision )
+@@ -11,7 +11,7 @@
+         firstname: 'string',
+         lastname: 'string',
+         phone_number: 'integer',
+-        certified:{type:'boolean', default:false},
++        certified: {type: 'boolean', default: false},
+         location: {
+             model: 'location'
+         }
+Index: api/models/Staff.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- api/models/Staff.js	(revision )
++++ api/models/Staff.js	(revision )
+@@ -0,0 +1,17 @@
++/**
++ * Staff.js
++ *
++ * @description :: TODO: You might write a short summary of how this model works and what it represents here.
++ * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
++ */
++
++module.exports = {
++
++  attributes: {
++    firstname: 'string',
++    lastname: 'string',
++    email:'email',
++    password:'string'
++  }
++};
++
+Index: api/models/User.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- api/models/User.js	(revision )
++++ api/models/User.js	(revision )
+@@ -0,0 +1,17 @@
++/**
++ * User.js
++ *
++ * @description :: TODO: You might write a short summary of how this model works and what it represents here.
++ * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
++ */
++
++module.exports = {
++
++    attributes: {
++        firstname: 'string',
++        lastname: 'string',
++        email: 'email',
++        password: 'string'
++    }
++};
++

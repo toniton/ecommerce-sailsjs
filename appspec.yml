@@ -1,0 +1,12 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /var/www/html/paytron/server
+hooks:
+    BeforeInstall:
+        - location: scripts/beforeInstall.bash
+          runas: root
+    AfterInstall:
+        - location: scripts/afterInstall.bash
+          runas: root

@@ -1,0 +1,14 @@
+{
+  "generators": {
+    "modules": {}
+  },
+  "paths": {
+    "public": "../dist"
+  },
+  "cors": {
+     "allRoutes": true
+  },
+  "hooks": {
+    "grunt": false
+  }
+}

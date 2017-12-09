@@ -1,0 +1,8 @@
+{
+    "uid": "paytron",
+    "append": true,
+    "watch": true,
+    "script": "app.js",
+    "sourceDir": "/var/www/html/paytron/server/",
+    "args": ["--prod"]
+}

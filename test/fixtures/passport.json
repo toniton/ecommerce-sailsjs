@@ -1,0 +1,9 @@
+[
+    {
+        "id": 7,
+        "protocol": "local",
+        "password": "password",
+        "accessToken": "token",
+        "user": 7
+    }
+]
