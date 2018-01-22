@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /var/www/html/paytron/server
+    destination: /var/www/ecommerce
 hooks:
     BeforeInstall:
         - location: scripts/beforeInstall.bash
