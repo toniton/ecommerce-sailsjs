@@ -14,6 +14,7 @@ var CronJob = require('cron').CronJob;
 module.exports.bootstrap = function (cb) {
   try {
     new CronJob('10 3 * * * *', function () {
+      
       // sails.controllers.disburse.autoDisburse(sails.request, sails.response, sails.next, function (err, data) {
       //   sails.log.debug(err, "err");
       // });
