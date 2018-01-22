@@ -11,4 +11,4 @@ if [ -d /var/www/html/ecommerce/.tmp ]; then
     sudo rm -rf /var/www/html/ecommerce/.tmp/public/
 fi
 
-cd /var/www/html/ecommerce && sudo npm i && sudo su && pm2 startOrRestart pm2.json --env production --watch
+cd /var/www/html/ecommerce && sudo npm i && sudo pm2 startOrRestart pm2.json --env production --watch
