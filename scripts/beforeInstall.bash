@@ -4,7 +4,9 @@
 # previous deployments. The servers auto scale so the directory may or may not
 # exist.
 cd /var/www/html/ecommerce
-pm2 stop pm2.json
+if [-f /var/www/html/ecommerce/pm2.json]; then
+    pm2 stop pm2.json
+fi
 if [ -d /var/www/html/ecommerce/ ]; then
     rm -rf /var/www/html/ecommerce/
 fi
