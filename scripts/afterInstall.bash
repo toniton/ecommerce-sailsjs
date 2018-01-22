@@ -6,8 +6,8 @@
 sudo mkdir -vp /var/www/html/ecommerce/config/ssl/
 sudo cp -r /etc/ssl/paytron/* /var/www/html/ecommerce/config/ssl/
 
-if [ -d /var/www/html/ecommerce/.tmp/ ]; then
-    sudo chown -R 1000 /var/www/html/ecommerce/.tmp/*
+if [ -d /var/www/html/ecommerce/.tmp ]; then
+    sudo chown -R 1000 /var/www/html/ecommerce/.tmp/
     sudo rm -rf /var/www/html/ecommerce/.tmp/public/
 fi
 
