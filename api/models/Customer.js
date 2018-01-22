@@ -34,7 +34,7 @@ module.exports = {
         },
         passports: {
             collection: 'Passport',
-            via: 'user'
+            via: 'customer'
         },
         roles: {
             collection: 'Role',

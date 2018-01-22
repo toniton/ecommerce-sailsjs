@@ -33,12 +33,12 @@ module.exports = {
       via: 'parent'
     },
     attributes: {
-      collection: 'category',
+      collection: 'attribute',
       via: 'category'
     },
     products: {
       collection: 'product',
-      via: 'category',
+      via: 'categories',
     }
   }
 };

@@ -35,6 +35,9 @@ var Passport = {
         user: {
             model: 'user',
             // required: true
+        },
+        customer: {
+            model: 'customer'
         }
     },
 

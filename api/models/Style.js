@@ -19,8 +19,7 @@ module.exports = {
       via: 'styles'
     },
     media: {
-      collection: 'media',
-      via: 'style'
+      collection: 'media'
     },
     createdBy: {
       model: 'user'

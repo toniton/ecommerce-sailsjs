@@ -21,7 +21,7 @@ module.exports = {
     },
     memos: {
       collection: "memo",
-      through: "order"
+      via: "order"
     },
     vat: {
       type: "float"

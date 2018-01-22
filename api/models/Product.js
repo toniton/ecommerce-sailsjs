@@ -48,7 +48,7 @@ module.exports = {
     },
     categories: {
         collection: 'category',
-        via: 'product',
+        via: 'products',
     },
     config: {
       type: "string",
