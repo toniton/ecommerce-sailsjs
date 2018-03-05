@@ -8,6 +8,6 @@ if [-f /var/www/html/ecommerce/pm2.json]; then
     pm2 stop pm2.json
 fi
 if [ -d /var/www/html/ecommerce/ ]; then
-    rm -rf /var/www/html/ecommerce/
+    sudo rm -rf /var/www/html/ecommerce/
 fi
 mkdir -vp /var/www/html/ecommerce/
