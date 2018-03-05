@@ -60,16 +60,16 @@ module.exports.connections = {
     adapter: 'sails-mongo',
     host: 'localhost',
     port: 27017,
-    user: 'root',
-    password: 'PICBvn8uOXpb',
+    user: 'toniton',
+    password: 'tofunmi18',
     database: 'ecommerce'
   },
   MongodbServerProduction: {
     adapter: 'sails-mongo',
     host: 'localhost',
     port: 23399,
-    user: 'root',
-    password: 'PICBvn8uOXpb',
+    user: 'toniton',
+    password: 'tofunmi18',
     database: 'ecommerce'
   },
 
