@@ -17,16 +17,21 @@ module.exports = {
       type: "string"
     },
     bannerUrl: {
-        type: 'string',
-        defaultsTo: null
+      type: 'string',
+      defaultsTo: () => {
+        return 'category/banner/default-placeholder';
+      }
     },
     bannerFd: {
-        type: 'string',
-        defaultsTo: '/Users/Toni/Documents/nodejs/paytron/server/assets/images/default.jpg'
+      type: 'string',
+      defaultsTo: () =>{
+        var defaultAssetsPath = require('path').resolve(sails.config.appPath, 'assets/images/category');
+        return defaultAssetsPath + '/default-placeholder.png';
+      }
     },
     parent: {
-        model: 'category',
-        defaultsTo: null
+      model: 'category',
+      defaultsTo: null
     },
     children: {
       collection: 'category',
