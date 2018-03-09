@@ -54,10 +54,10 @@ module.exports.policies = {
     'isAuthenticated',
     // 'sessionAuth',
     'ModelPolicy',
-    'AuditPolicy',
-    'OwnerPolicy',
+    // 'AuditPolicy',
+    // 'OwnerPolicy',
     'PermissionPolicy',
     'RolePolicy',
-    'CriteriaPolicy'
+    // 'CriteriaPolicy'
   ]
 };
