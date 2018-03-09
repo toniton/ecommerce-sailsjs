@@ -52,12 +52,12 @@ module.exports.policies = {
   '*': [
     'hasToken',
     'isAuthenticated',
-    // 'sessionAuth',
+    'sessionAuth',
     'ModelPolicy',
-    // 'AuditPolicy',
-    // 'OwnerPolicy',
+    'AuditPolicy',
+    'OwnerPolicy',
     'PermissionPolicy',
     'RolePolicy',
-    // 'CriteriaPolicy'
+    'CriteriaPolicy'
   ]
 };
