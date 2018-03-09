@@ -100,7 +100,10 @@ module.exports = {
                                     if (err) {
                                         reject(err);
                                     }
-                                    if (response.length !== 1) {
+                                    if (typeof(response) === 'undefined') {
+                                        category.productCount = 0;
+                                    }
+                                    if (response && response.length !== 1) {
                                         category.productCount = 0;
                                     }
                                     if (response[0] && response[0].products) {
@@ -151,6 +154,9 @@ module.exports = {
                                 console.log(err, response);
                                 if (err) {
                                     reject(err);
+                                }
+                                if (typeof(response) === 'undefined') {
+                                    category.productCount = 0;
                                 }
                                 if (response.length !== 1) {
                                     category.productCount = 0;
