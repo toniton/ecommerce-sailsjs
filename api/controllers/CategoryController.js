@@ -63,6 +63,10 @@ module.exports = {
         }
     },
     find: function (req, res) {
+        var reqData = actionUtil.parseValues(req);
+        if (reqData.id) {
+            return this.findOne(req, res);
+        }
         Category.find({ "parent": null }).populate('children')
             .then((data) => {
                 return Promise.map(data, (category) => {
@@ -108,6 +112,57 @@ module.exports = {
                         });
                     });
                 }).then((categories) => res.ok(categories));
+            }).catch((reason) => res.negotiate(reason));
+    },
+    findOne: function (req, res) {
+        req.validate({
+            id: 'string'
+        });
+        var reqData = actionUtil.parseValues(req);
+        Category.findOne({ id: reqData.id }).populate('children')
+            .then((category) => {
+                return new Promise((resolve, reject) => {
+                    Product.native((err, collection) => {
+                        if (err) return res.serverError(err);
+
+                        collection.aggregate([
+                            {
+                                $lookup: {
+                                    from: "category_products__product_categories",
+                                    localField: "_id",
+                                    foreignField: "product_categories",
+                                    as: "categories"
+                                }
+                            },
+                            {
+                                $project: {
+                                    categories: 1
+                                }
+                            },
+                            { $unwind: "$categories" },
+                            {
+                                $match: {
+                                    "categories.category_products": new ObjectId(category.id)
+                                }
+                            },
+                            { $count: "products" }
+                        ],
+                            function (err, response) {
+                                console.log(err, response);
+                                if (err) {
+                                    reject(err);
+                                }
+                                if (response.length !== 1) {
+                                    category.productCount = 0;
+                                }
+                                if (response[0] && response[0].products) {
+                                    category.productCount = response[0].products;
+                                }
+                                resolve(category);
+                            }
+                        );
+                    });
+                }).then((category) => res.ok(category));
             }).catch((reason) => res.negotiate(reason));
     }
 };
