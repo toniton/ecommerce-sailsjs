@@ -32,7 +32,7 @@ var JWT_STRATEGY_CONFIG = {
     issuer: ISSUER,
     audience: AUDIENCE,
     passReqToCallback: false,
-    jwtFromRequest: sails.config.passport.jwt.extractJwt.fromAuthHeader()
+    jwtFromRequest: sails.config.passport.jwt.extractJwt.fromAuthHeaderWithScheme("jwt")
 };
 
 /**
