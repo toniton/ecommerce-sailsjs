@@ -6,7 +6,7 @@
  */
 
 module.exports = {
-
+  schema: true,
   attributes: {
     name: {
       type: "string",
@@ -46,9 +46,9 @@ module.exports = {
       via: 'categories',
     },
     toJSON: function () {
-        var obj = this.toObject();
-        delete obj.bannerFd;
-        return obj;
+      var obj = this.toObject();
+      delete obj.bannerFd;
+      return obj;
     }
   }
 };
