@@ -102,11 +102,9 @@ module.exports = {
                                     }
                                     if (typeof(response) === 'undefined') {
                                         category.productCount = 0;
-                                    }
-                                    if (response && response.length !== 1) {
+                                    } else if (response && response.length !== 1) {
                                         category.productCount = 0;
-                                    }
-                                    if (response[0] && response[0].products) {
+                                    } else if (response && response[0] && response[0].products) {
                                         category.productCount = response[0].products;
                                     }
                                     resolve(category);
@@ -151,17 +149,14 @@ module.exports = {
                             { $count: "products" }
                         ],
                             function (err, response) {
-                                console.log(err, response);
                                 if (err) {
                                     reject(err);
                                 }
                                 if (typeof(response) === 'undefined') {
                                     category.productCount = 0;
-                                }
-                                if (response.length !== 1) {
+                                } else if (response && response.length !== 1) {
                                     category.productCount = 0;
-                                }
-                                if (response[0] && response[0].products) {
+                                } else if (response && response[0] && response[0].products) {
                                     category.productCount = response[0].products;
                                 }
                                 resolve(category);
