@@ -38,31 +38,37 @@ module.exports = {
         },
         roles: {
             collection: 'Role',
-            via: 'users',
+            via: 'customers',
             dominant: true
         },
         status: {
             enum: ['active', 'disabled'], 
             defaultsTo: 'active' 
         },
+        createdBy: {
+            model: 'Customer',
+            index: true
+        },
+        owner: {
+            model: 'Customer',
+            index: true
+        },
         toJSON: function () {
             var obj = this.toObject();
             delete obj.passports;
             delete obj.createdAt;
             delete obj.updatedAt;
+            delete obj.owner;
             return obj;
         }
     },
     afterCreate: function (values, cb) {
-        values.identity = 'User';
+        values.identity = 'customer';
         Promise.all([
-            AuthService.assignRole(values.id, 'user'),
+            AuthService.assignRole(values, 'customer'),
+            AuthService.setCreatedBy(values),
             EmailService.welcome(values)
-        ]).then(function (result) {
-            cb();
-        }).catch(function(error){
-            sails.log.error(error);
-            cb(null);
-        });
+        ]).then(() => cb())
+        .catch(() => cb(null));
     }
 };

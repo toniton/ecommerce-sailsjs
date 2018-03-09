@@ -23,6 +23,7 @@ module.exports = {
             if (!model) {
                 return res.forbidden(null, info && info.code, info && info.message);
             }
+            req.session.authenticated = true;
             return res.ok({
                 token: AuthService.createToken(model),
                 uid: model.id
@@ -39,16 +40,15 @@ module.exports = {
             password: "string"
         });
         var reqData = actionUtil.parseValues(req);
-        User.create(reqData).exec(function (err, user) {
-            if (err) {
-                return res.forbidden(err, null, "Error occurred while trying to set up an account for you.");
-            }
+        Customer.create(reqData)
+        .then((customer)=>{
             if (reqData.password) {
-                user.passports.add(AuthService.generatePassport(reqData.password));
-                user.save();
+                customer.passports.add(AuthService.generatePassport(reqData.password));
+                customer.save();
             }
-            return res.ok(user);
-        });
+            req.session.authenticated = true;
+            return res.ok(customer);
+        }).catch((reason) => res.forbidden(reason, null, "Error occurred while trying to set up an account for you."));
     },
 
     resetPasswordLink: function (req, res) {

@@ -23,6 +23,7 @@ module.exports = {
             if (!model) {
                 return res.forbidden(null, info && info.code, info && info.message);
             }
+            req.session.authenticated = true;
             return res.ok({
                 token: AuthService.createToken(model),
                 uid: model.id
@@ -47,6 +48,7 @@ module.exports = {
                 user.passports.add(AuthService.generatePassport(reqData.password));
                 user.save();
             }
+            req.session.authenticated = true;
             return res.ok(user);
         });
     },

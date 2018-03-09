@@ -6,6 +6,8 @@
  */
 var actionUtil = require('sails/lib/hooks/blueprints/actionUtil');
 var bcrypt = require('bcrypt-nodejs');
+var Promise = require('bluebird');
+var ObjectId = require('mongodb').ObjectID;
 
 module.exports = {
     upload: function (req, res) {
@@ -54,11 +56,59 @@ module.exports = {
                     return res.notFound();
                 }
                 res.set("Content-disposition", "attachment; filename='" + category.bannerFd + "'");
-                fileAdapter.read(user.bannerFd).on('error', function (err) {
+                fileAdapter.read(category.bannerFd).on('error', function (err) {
                     return res.serverError(err);
                 }).pipe(res);
             });
         }
     },
+    find: function (req, res) {
+        Category.find({ "parent": null }).populate('children')
+            .then((data) => {
+                return Promise.map(data, (category) => {
+                    return new Promise((resolve, reject) => {
+                        Product.native((err, collection) => {
+                            if (err) return res.serverError(err);
+
+                            collection.aggregate([
+                                {
+                                    $lookup: {
+                                        from: "category_products__product_categories",
+                                        localField: "_id",
+                                        foreignField: "product_categories",
+                                        as: "categories"
+                                    }
+                                },
+                                {
+                                    $project: {
+                                        categories: 1
+                                    }
+                                },
+                                { $unwind: "$categories" },
+                                {
+                                    $match: {
+                                        "categories.category_products": new ObjectId(category.id)
+                                    }
+                                },
+                                { $count: "products" }
+                            ],
+                                function (err, response) {
+                                    if (err) {
+                                        reject(err);
+                                    }
+                                    if (response.length !== 1) {
+                                        category.productCount = 0;
+                                    }
+                                    if (response[0] && response[0].products) {
+                                        category.productCount = response[0].products;
+                                    }
+                                    resolve(category);
+                                }
+                            );
+                        });
+                    });
+                }).then((categories) => res.ok(categories));
+            }).catch((reason) => res.negotiate(reason));
+    }
 };
 

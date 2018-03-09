@@ -28,29 +28,26 @@ module.exports = function (sails) {
                 return sails.lower();
             }
 
-            sails.after(sails.config.permissions.afterEvent, function () {
+            sails.after(sails.config.permissions.afterEvent, () => {
                 installModelOwnership(sails);
             });
 
-            sails.after('hook:orm:loaded', function () {
+            sails.after('hook:orm:loaded', () => {
                 Model.count()
-                    .then(function (count) {
-                        if (count == sails.models.length){
-                            return next()
-                        };
-                        return initializeFixtures(sails)
-                            .then(function () {
-                                sails.emit('hook:permissions:loaded');
-                                next();
-                            });
-                    })
-                    .catch(function (error) {
+                    .then((count) => {
+                        if (count == sails.models.length) {
+                            return next();
+                        }
+                        return initializeFixtures(sails).then(() => {
+                            sails.emit('hook:permissions:loaded');
+                            next();
+                        });
+                    }).catch((error) => {
                         sails.log.error(error);
                         next(error);
                     });
             });
         }
-
     };
 };
 
@@ -60,20 +57,16 @@ module.exports = function (sails) {
  */
 function initializeFixtures(sails) {
     return require('../../config/fixtures/model').createModels()
-        .bind({})
-        .then(function (_models) {
+        .bind({}).then((_models) => {
             this.models = _models;
             sails.hooks['permissions']._modelCache = _.indexBy(_models, 'identity');
             return require('../../config/fixtures/role').create();
-        })
-        .then(function (roles) {
-            this.roles = roles
+        }).then((roles) => {
+            this.roles = roles;
             return require('../../config/fixtures/admin').create(this.roles);
-        })
-        .then(function (admin) {
+        }).then((admin) => {
             return require('../../config/fixtures/permission').create(this.roles, this.models, admin);
-        })
-        .catch(function (error) {
+        }).catch((error) => {
             sails.log.warn(error);
         });
 }
@@ -81,11 +74,11 @@ function initializeFixtures(sails) {
 function installModelOwnership(sails) {
     var models = sails.models;
     if (sails.config.models.autoCreatedBy === false) return;
-    _.each(models, function (model) {
+    _.each(models, (model) => {
         if (model.autoCreatedBy === false) return;
         _.defaults(model.attributes, {
             createdBy: {
-                model: 'Account',
+                model: 'User',
                 index: true
             }
         });

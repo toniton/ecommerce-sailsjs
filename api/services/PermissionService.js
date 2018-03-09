@@ -16,7 +16,7 @@ module.exports = {
    * Given an object, or a list of objects, return true if the list contains
    * objects not owned by the specified user.
    */
-  hasForeignObjects: function(objects, user) {
+  hasForeignObjects: function (objects, user) {
     if (!_.isArray(objects)) {
       return PermissionService.isForeignObject(user.id)(objects);
     }
@@ -26,8 +26,8 @@ module.exports = {
   /**
    * Return whether the specified object is NOT owned by the specified user.
    */
-  isForeignObject: function(owner) {
-    return function(object) {
+  isForeignObject: function (owner) {
+    return function (object) {
       //sails.log.verbose('object', object);
       //sails.log.verbose('object.owner: ', object.owner, ', owner:', owner);
       return object.owner !== owner;
@@ -43,7 +43,7 @@ module.exports = {
    *
    * TODO this will be less expensive when waterline supports a caching layer
    */
-  findTargetObjects: function(req) {
+  findTargetObjects: function (req) {
 
 
     // handle add/remove routes that have :parentid as the primary key field
@@ -53,16 +53,16 @@ module.exports = {
       req.params.id = req.params.parentid;
     }
 
-    return new Promise(function(resolve, reject) {
-        findRecords(req, {
-          ok: resolve,
-          serverError: reject,
-          // this isn't perfect, since it returns a 500 error instead of a 404 error
-          // but it is better than crashing the app when a record doesn't exist
-          notFound: reject
-        });
-      })
-      .then(function(result) {
+    return new Promise(function (resolve, reject) {
+      findRecords(req, {
+        ok: resolve,
+        serverError: reject,
+        // this isn't perfect, since it returns a 500 error instead of a 404 error
+        // but it is better than crashing the app when a record doesn't exist
+        notFound: reject
+      });
+    })
+      .then(function (result) {
         if (originalId !== undefined) {
           req.params.id = originalId;
         }
@@ -78,27 +78,32 @@ module.exports = {
    * @param options.model
    * @param options.user
    */
-  findModelPermissions: function(options) {
+  findModelPermissions: function (options) {
     var action = PermissionService.getMethod(options.method);
     var permissionCriteria = {
       model: options.model.id,
       action: action
     };
-
-    return User.findOne(options.user.id)
+    var Model = sails.models[options.user.identity];
+    return Model.findOne(options.user.id)
       .populate('roles')
-      .then(function(user) {
-        var roleId = _.map(user.roles, 'id');
-        return Permission.find({
-          model: options.model.id,
-          action: action,
-          or: [{
-            user: user.id
-          }, {
-            role: roleId
-          }]
-        }).populate('criteria');
-      });
+      .then((model) => {
+        var roleId = _.map(model.roles, 'id');
+        return Permission.find(
+          {
+            model: options.model.id,
+            action: action,
+            or: [
+              {
+                user: model.id
+              },
+              {
+                role: roleId
+              }
+            ]
+          }
+        ).populate('criteria');
+      }).catch(() => false);
   },
 
   /**
@@ -114,7 +119,7 @@ module.exports = {
    * @returns boolean - True if there is at least one granted permission that allows the requested action,
    * otherwise false
    */
-  hasPassingCriteria: function(objects, permissions, attributes, user) {
+  hasPassingCriteria: function (objects, permissions, attributes, user) {
     // return success if there are no permissions or objects
     if (_.isEmpty(permissions) || _.isEmpty(objects)) return true;
 
@@ -122,7 +127,7 @@ module.exports = {
       objects = [objects];
     }
 
-    var criteria = permissions.reduce(function(memo, perm) {
+    var criteria = permissions.reduce(function (memo, perm) {
       if (perm) {
         if (!perm.criteria || perm.criteria.length == 0) {
           // If a permission has no criteria then it passes for all cases
@@ -134,7 +139,7 @@ module.exports = {
           memo = memo.concat(perm.criteria);
         }
         if (perm.relation === 'owner') {
-          perm.criteria.forEach(function(criteria) {
+          perm.criteria.forEach(function (criteria) {
             criteria.owner = true;
           });
         }
@@ -152,8 +157,8 @@ module.exports = {
     }
 
     // every object must have at least one permission that has a passing criteria and a passing attribute check
-    return objects.every(function(obj) {
-      return criteria.some(function(criteria) {
+    return objects.every(function (obj) {
+      return criteria.some(function (criteria) {
         var match = wlFilter([obj], {
           where: criteria.where
         }).results;
@@ -168,7 +173,7 @@ module.exports = {
 
   },
 
-  hasUnpermittedAttributes: function(attributes, blacklist) {
+  hasUnpermittedAttributes: function (attributes, blacklist) {
     if (_.isEmpty(attributes) || _.isEmpty(blacklist)) {
       return false;
     }
@@ -179,14 +184,14 @@ module.exports = {
    * Return true if the specified model supports the ownership policy; false
    * otherwise.
    */
-  hasOwnershipPolicy: function(model) {
+  hasOwnershipPolicy: function (model) {
     return model.autoCreatedBy;
   },
 
   /**
    * Build an error message
    */
-  getErrorMessage: function(options) {
+  getErrorMessage: function (options) {
     return [
       'User', options.user.email, 'is not permitted to', options.method, options.model.name
     ].join(' ');
@@ -195,7 +200,7 @@ module.exports = {
   /**
    * Given an action, return the CRUD method it maps to.
    */
-  getMethod: function(method) {
+  getMethod: function (method) {
     return methodMap[method];
   },
 
@@ -210,7 +215,7 @@ module.exports = {
    * @param options.permissions.criteria.blacklist {string array} - optional attribute blacklist
    * @param options.users {array of user names} - optional array of user ids that have this role
    */
-  createRole: function(options) {
+  createRole: function (options) {
 
     var ok = Promise.resolve();
     var permissions = options.permissions;
@@ -221,12 +226,12 @@ module.exports = {
 
 
     // look up the model id based on the model name for each permission, and change it to an id
-    ok = ok.then(function() {
-      return Promise.map(permissions, function(permission) {
+    ok = ok.then(function () {
+      return Promise.map(permissions, function (permission) {
         return Model.findOne({
-            name: permission.model
-          })
-          .then(function(model) {
+          name: permission.model
+        })
+          .then(function (model) {
             permission.model = model.id;
             return permission;
           });
@@ -234,18 +239,18 @@ module.exports = {
     });
 
     // look up user ids based on usernames, and replace the names with ids
-    ok = ok.then(function(permissions) {
+    ok = ok.then(function (permissions) {
       if (options.users) {
         return User.find({
-            username: options.users
-          })
-          .then(function(users) {
+          username: options.users
+        })
+          .then(function (users) {
             options.users = users;
           });
       }
     });
 
-    ok = ok.then(function(users) {
+    ok = ok.then(function (users) {
       return Role.create(options);
     });
 
@@ -265,13 +270,13 @@ module.exports = {
    * @param options.criteria.where - optional waterline query syntax object for specifying permissions
    * @param options.criteria.blacklist {string array} - optional attribute blacklist
    */
-  grant: function(permissions) {
+  grant: function (permissions) {
     if (!_.isArray(permissions)) {
       permissions = [permissions];
     }
 
     // look up the models based on name, and replace them with ids
-    var ok = Promise.map(permissions, function(permission) {
+    var ok = Promise.map(permissions, function (permission) {
       var findRole = permission.role ? Role.findOne({
         name: permission.role
       }) : null;
@@ -279,9 +284,9 @@ module.exports = {
         username: permission.user
       }) : null;
       return Promise.all([findRole, findUser, Model.findOne({
-          name: permission.model
-        })])
-        .spread(function(role, user, model) {
+        name: permission.model
+      })])
+        .spread(function (role, user, model) {
           permission.model = model.id;
           if (role && role.id) {
             permission.role = role.id;
@@ -293,7 +298,7 @@ module.exports = {
         });
     });
 
-    ok = ok.then(function() {
+    ok = ok.then(function () {
       return Permission.create(permissions);
     });
 
@@ -306,7 +311,7 @@ module.exports = {
    * @param usernames {string or string array} - list of names of users
    * @param rolename {string} - the name of the role that the users should be added to
    */
-  addUsersToRole: function(usernames, rolename) {
+  addUsersToRole: function (usernames, rolename) {
     if (_.isEmpty(usernames)) {
       return Promise.reject(new Error('One or more usernames must be provided'));
     }
@@ -317,10 +322,10 @@ module.exports = {
 
     return Role.findOne({
       name: rolename
-    }).populate('users').then(function(role) {
+    }).populate('users').then(function (role) {
       return User.find({
         username: usernames
-      }).then(function(users) {
+      }).then(function (users) {
         role.users.add(_.map(users, 'id'));
         return role.save();
       });
@@ -333,7 +338,7 @@ module.exports = {
    * @params usernames {string or string array} - name or list of names of users
    * @params rolename {string} - the name of the role that the users should be removed from
    */
-  removeUsersFromRole: function(usernames, rolename) {
+  removeUsersFromRole: function (usernames, rolename) {
     if (_.isEmpty(usernames)) {
       return Promise.reject(new Error('One or more usernames must be provided'));
     }
@@ -343,20 +348,20 @@ module.exports = {
     }
 
     return Role.findOne({
-        name: rolename
-      })
+      name: rolename
+    })
       .populate('users')
-      .then(function(role) {
+      .then(function (role) {
         return User.find({
           username: usernames
         }, {
-          select: ['id']
-        }).then(function(users) {
-          users.map(function(users) {
-            role.users.remove(user.id);
+            select: ['id']
+          }).then(function (users) {
+            users.map(function (users) {
+              role.users.remove(user.id);
+            });
+            return role.save();
           });
-          return role.save();
-        });
       });
   },
 
@@ -369,7 +374,7 @@ module.exports = {
    * @param options.action {string} - the name of the action for the permission
    * @param options.relation {string} - the type of the relation (owner or role)
    */
-  revoke: function(options) {
+  revoke: function (options) {
     var findRole = options.role ? Role.findOne({
       name: options.role
     }) : null;
@@ -380,7 +385,7 @@ module.exports = {
       name: options.model
     })]);
 
-    ok = ok.spread(function(role, user, model) {
+    ok = ok.spread(function (role, user, model) {
 
       var query = {
         model: model.id,
@@ -411,13 +416,13 @@ module.exports = {
    * @param body
    * @returns {*}
    */
-  isAllowedToPerformAction: function(objects, user, action, model, body) {
+  isAllowedToPerformAction: function (objects, user, action, model, body) {
     if (!_.isArray(objects)) {
       return PermissionService.isAllowedToPerformSingle(user.id, action, model, body)(objects);
     }
     return new Promise.map(objects, PermissionService.isAllowedToPerformSingle(user.id, action, model, body))
-      .then(function(allowedArray) {
-        return allowedArray.every(function(allowed) {
+      .then(function (allowedArray) {
+        return allowedArray.every(function (allowed) {
           return allowed === true;
         });
       });
@@ -431,19 +436,26 @@ module.exports = {
    * @param body
    * @returns {Function}
    */
-  isAllowedToPerformSingle: function(user, action, model, body) {
-    return function(obj) {
-      return new Promise(function(resolve, reject) {
+  isAllowedToPerformSingle: function (user, action, model, body) {
+    sails.log.warn(user);
+    return function (obj) {
+      return new Promise(function (resolve, reject) {
         Model.findOne({
           identity: model
-        }).then(function(model) {
+        }).then(function (model) {
+          // return Permission.find({
+          //   model: model.id,
+          //   action: action,
+          //   relation: 'user',
+          //   user: user
+          // }).populate('criteria');
           return Permission.find({
             model: model.id,
             action: action,
             relation: 'user',
-            user: user
+            customer: user
           }).populate('criteria');
-        }).then(function(permission) {
+        }).then(function (permission) {
           if (permission.length > 0 && PermissionService.hasPassingCriteria(obj, permission, body)) {
             resolve(true);
           } else {

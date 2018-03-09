@@ -33,52 +33,31 @@ module.exports.policies = {
     'resetPasswordLink': true,
     'newPassword': true
   },
-  CardController: {
-    'openTransfer': true,
-    'otpValidateCharge': true,
-    'enquiry':true
+  CustomerController: {
+    'login': true,
+    'signup': true,
+    'resetPasswordLink': true,
+    'newPassword': true
   },
-  LightController: {
-    'validate': true,
-    'getToken': true,
-    'sendToken': true
-  },
-  LightVendorController: {
+  CategoryController: {
     'find': true,
-    'findOne': true
+    'findOne': true,
+    'banner': true
   },
-  BankAccountController: {
-    'verify': true
-  },
-  BankController: {
-    'availableBanks': true
+  ProductController: {
+    'find': true,
+    'findOne': true,
+    'thumbnail': true
   },
   '*': [
     'hasToken',
     'isAuthenticated',
+    'sessionAuth',
     'ModelPolicy',
+    'AuditPolicy',
+    'OwnerPolicy',
     'PermissionPolicy',
-    'RolePolicy'
-  ],
-
-  /***************************************************************************
-  *                                                                          *
-  * Here's an example of mapping some policies to run before a controller    *
-  * and its actions                                                          *
-  *                                                                          *
-  ***************************************************************************/
-  // RabbitController: {
-
-  // Apply the `false` policy as the default for all of RabbitController's actions
-  // (`false` prevents all access, which ensures that nothing bad happens to our rabbits)
-  // '*': false,
-
-  // For the action `nurture`, apply the 'isRabbitMother' policy
-  // (this overrides `false` above)
-  // nurture	: 'isRabbitMother',
-
-  // Apply the `isNiceToAnimals` AND `hasRabbitFood` policies
-  // before letting any users feed our rabbits
-  // feed : ['isNiceToAnimals', 'hasRabbitFood']
-  // }
+    'RolePolicy',
+    'CriteriaPolicy'
+  ]
 };

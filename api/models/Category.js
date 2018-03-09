@@ -24,7 +24,7 @@ module.exports = {
     },
     bannerFd: {
       type: 'string',
-      defaultsTo: () =>{
+      defaultsTo: () => {
         var defaultAssetsPath = require('path').resolve(sails.config.appPath, 'assets/images/category');
         return defaultAssetsPath + '/default-placeholder.png';
       }
@@ -44,6 +44,11 @@ module.exports = {
     products: {
       collection: 'product',
       via: 'categories',
+    },
+    toJSON: function () {
+        var obj = this.toObject();
+        delete obj.bannerFd;
+        return obj;
     }
   }
 };

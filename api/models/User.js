@@ -20,13 +20,13 @@ module.exports = {
             type: 'string',
             required: true,
             unique: true,
-            maxLength:14
+            maxLength: 14
         },
         email: {
             type: 'string',
             required: true,
             unique: true,
-            email:true
+            email: true
         },
         accessToken: {
             type: 'string',
@@ -42,8 +42,14 @@ module.exports = {
             dominant: true
         },
         status: {
-            enum: ['active', 'disabled'], 
-            defaultsTo: 'active' 
+            enum: ['active', 'disabled'],
+            defaultsTo: 'active'
+        },
+        createdBy: {
+            model: 'User'
+        },
+        owner: {
+            model: 'User'
         },
         toJSON: function () {
             var obj = this.toObject();
@@ -54,15 +60,12 @@ module.exports = {
         }
     },
     afterCreate: function (values, cb) {
-        values.identity = 'User';
+        values.identity = 'user';
         Promise.all([
-            AuthService.assignRole(values.id, 'user'),
+            AuthService.assignRole(values, 'user'),
             EmailService.welcome(values)
-        ]).then(function (result) {
-            cb();
-        }).catch(function(error){
-            sails.log.error(error);
-            cb(null);
-        });
+        ])
+        .then(() => cb())
+        .catch(() => cb(null));
     }
 };

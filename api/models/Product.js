@@ -40,19 +40,25 @@ module.exports = {
     },
     thumbnailUrl: {
         type: 'string',
-        defaultsTo: null
+        defaultsTo: () => {
+          return 'product/thumbnail/default-placeholder';
+        }
     },
     thumbnailFd: {
         type: 'string',
-        defaultsTo: '/Users/Toni/Documents/nodejs/paytron/server/assets/images/default.jpg'
+        defaultsTo: () =>{
+          var defaultAssetsPath = require('path').resolve(sails.config.appPath, 'assets/images/product');
+          return defaultAssetsPath + '/default-placeholder.png';
+        }
     },
     categories: {
         collection: 'category',
         via: 'products',
     },
     config: {
-      type: "string",
-      enum: ["simple","configurable","downloadable","virtual"]
+      type: 'string',
+      enum: ['simple','configurable','downloadable','virtual'],
+      defaultsTo: 'simple'
     },
     parent: {
         model: 'product',
@@ -60,7 +66,8 @@ module.exports = {
     },
     children: {
       collection: 'product',
-      via: 'parent'
+      via: 'parent',
+      defaultsTo: null
     },
     media: {
       collection: 'media',
@@ -80,7 +87,8 @@ module.exports = {
     },
     status: {
       type: 'string',
-      enum: ['pending', 'approved', 'denied']
+      enum: ['pending', 'approved', 'denied'],
+      defaultsTo: 'pending'
     }
   }
 };

@@ -23,6 +23,13 @@ var modelRestrictions = {
         'User',
         'Model',
         'Passport'
+    ],
+    customer: [
+        'Role',
+        'Permission',
+        'User',
+        'Model',
+        'Passport'
     ]
 };
 
@@ -34,7 +41,8 @@ var modelRestrictions = {
 exports.create = function (roles, models, admin) {
     return Promise.all([
         grantAdminPermissions(roles, models, admin),
-        grantUserPermissions(roles, models, admin)
+        grantUserPermissions(roles, models, admin),
+        grantCustomerPermissions(roles, models, admin)
     ]).then(function (permissions) {
         return permissions;
     });
@@ -60,61 +68,6 @@ function grantUserPermissions(roles, models, admin) {
     var registeredRole = _.find(roles, { name: 'user' });
     var permissions = [
         {
-            model: _.find(models, { name: 'Card' }).id,
-            action: 'create',
-            role: registeredRole.id
-        },
-        {
-            model: _.find(models, { name: 'Card' }).id,
-            action: 'read',
-            role: registeredRole.id
-        },
-        {
-            model: _.find(models, { name: 'Card' }).id,
-            action: 'update',
-            role: registeredRole.id
-        },
-        {
-            model: _.find(models, { name: 'Card' }).id,
-            action: 'delete',
-            role: registeredRole.id
-        },
-        {
-            model: _.find(models, { name: 'Bank' }).id,
-            action: 'read',
-            role: registeredRole.id
-        },
-        {
-            model: _.find(models, { name: 'BankAccount' }).id,
-            action: 'create',
-            role: registeredRole.id
-        },
-        {
-            model: _.find(models, { name: 'BankAccount' }).id,
-            action: 'read',
-            role: registeredRole.id
-        },
-        {
-            model: _.find(models, { name: 'BankAccount' }).id,
-            action: 'update',
-            role: registeredRole.id
-        },
-        {
-            model: _.find(models, { name: 'BankAccount' }).id,
-            action: 'delete',
-            role: registeredRole.id
-        },
-        {
-            model: _.find(models, { name: 'Transaction' }).id,
-            action: 'create',
-            role: registeredRole.id
-        },
-        {
-            model: _.find(models, { name: 'Transaction' }).id,
-            action: 'read',
-            role: registeredRole.id
-        },
-        {
             model: _.find(models, { name: 'Permission' }).id,
             action: 'read',
             role: registeredRole.id
@@ -134,6 +87,47 @@ function grantUserPermissions(roles, models, admin) {
             model: _.find(models, { name: 'User' }).id,
             action: 'read',
             role: registeredRole.id,
+            relation: 'owner'
+        }
+    ];
+
+    return Promise.all(
+        _.map(permissions, function (permission) {
+            return Permission.findOrCreate(permission, permission);
+        })
+    );
+}
+
+function grantCustomerPermissions(roles, models, admin) {
+    var registeredRole = _.find(roles, { name: 'customer' });
+    var permissions = [
+        {
+            model: _.find(models, { name: 'Permission' }).id,
+            action: 'read',
+            role: registeredRole.id
+        },
+        {
+            model: _.find(models, { name: 'Model' }).id,
+            action: 'read',
+            role: registeredRole.id
+        },
+        {
+            model: _.find(models, { name: 'Customer' }).id,
+            action: 'update',
+            role: registeredRole.id,
+            criteria: { 
+                where: { status: 'active'},
+                blacklist: ['passports', 'accessToken', 'roles', 'status', 'email'] 
+            },
+            relation: 'owner'
+        },
+        {
+            model: _.find(models, { name: 'Customer' }).id,
+            action: 'read',
+            role: registeredRole.id,
+            criteria: {
+                blacklist: ['passports', 'accessToken', 'roles'] 
+            },
             relation: 'owner'
         }
     ];

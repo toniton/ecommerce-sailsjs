@@ -46,8 +46,8 @@ var SOCIAL_STRATEGY_CONFIG = {
     consumerKey: '-',
     consumerSecret: '-',
     passReqToCallback: true,
-    authorizationURL:'-',
-    tokenURL:'-'
+    authorizationURL: '-',
+    tokenURL: '-'
 };
 
 /**
@@ -59,45 +59,47 @@ var SOCIAL_STRATEGY_CONFIG = {
  */
 function _onLocalStrategyAuth(req, email, password, next) {
     var Model = actionUtil.parseModel(req);
-    User.findOne({
-            email: email
-        }).then(function(user) {
-            if(!user){
-                return next(null, false, {
-                    code: 'E_USER_NOT_FOUND',
-                    message: 'User with email '+email + ' is not found'
-                });
-            }
-            if(user.status == 'disabled'){
-                return next(null, false, {
-                    code: 'E_USER_DISABLED',
-                    message: 'This user is disabled, contact admin for authorization.'
-                });
-            }
-            Passport.findOne({
-                protocol: 'local',
-                user: user.id
-            }, function(err, passport) {
-                if (!passport) {
-                    return next(null, false, {
-                        code: 'E_NO_PASSWORD',
-                        message: 'Password not set for this account'
-                    });
-                }
-                if (!bcrypt.compareSync(password, passport.password)) {
-                    return next(null, false, {
-                        code: 'E_INVALID_PASSWORD',
-                        message: 'Provided password for  email ' + email + ' is invalid'
-                    });
-                }
-                return next(null, user, {});
-            });
-        }).catch(function(){
+    var authObject = {
+        protocol: 'local'
+    };
+    Model.findOne({
+        email: email
+    }).then(function (model) {
+        if (!model) {
             return next(null, false, {
                 code: 'E_USER_NOT_FOUND',
-                message: 'Account with email '+email + ' is not found'
+                message: 'User with email ' + email + ' is not found'
             });
+        }
+        if (model.status == 'disabled') {
+            return next(null, false, {
+                code: 'E_USER_DISABLED',
+                message: 'This user is disabled, contact admin for authorization.'
+            });
+        }
+        authObject[Model.identity] = model.id;
+        model.identity = Model.identity;
+        Passport.findOne(authObject, function (err, passport) {
+            if (!passport) {
+                return next(null, false, {
+                    code: 'E_NO_PASSWORD',
+                    message: 'Password not set for this account'
+                });
+            }
+            if (!bcrypt.compareSync(password, passport.password)) {
+                return next(null, false, {
+                    code: 'E_INVALID_PASSWORD',
+                    message: 'Provided password for  email ' + email + ' is invalid'
+                });
+            }
+            return next(null, model, {});
         });
+    }).catch(function () {
+        return next(null, false, {
+            code: 'E_USER_NOT_FOUND',
+            message: 'Account with email ' + email + ' is not found'
+        });
+    });
 }
 
 /**
@@ -138,9 +140,9 @@ function _onSocialStrategyAuth(req, accessToken, refreshToken, profile, next) {
         model.socialProfiles[profile.provider] = profile._json;
 
         User
-        // TODO: check if criteria is working
+            // TODO: check if criteria is working
             .findOrCreate(criteria, model)
-            .exec(function(error, user) {
+            .exec(function (error, user) {
                 if (error) return next(error, false, {});
                 if (!user) return next(null, false, {
                     code: 'E_AUTH_FAILED',

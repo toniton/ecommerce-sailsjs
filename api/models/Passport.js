@@ -33,8 +33,7 @@ var Passport = {
             type: 'string'
         },
         user: {
-            model: 'user',
-            // required: true
+            model: 'user'
         },
         customer: {
             model: 'customer'

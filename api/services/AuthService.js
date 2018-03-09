@@ -4,6 +4,7 @@
 
 var bcrypt = require('bcrypt-nodejs');
 var jwt = require('jsonwebtoken');
+var Promise = require('bluebird');
 
 module.exports = {
     hashPassword: function (passport) {
@@ -30,19 +31,30 @@ module.exports = {
         );
     },
 
-    assignRole: function (userId, roleName) {
-        var promise = new Promise(function (resolve, reject) {
-            User.findOne({id: userId }).then(function (user) {
-                Role.findOne({name: roleName }).then(function (role) {
-                    user.roles.add(role);
-                    user.save();
-                    resolve(user);
-                }).catch(function(err){
-                    reject(err);
-                });
-            }).catch(function(err){
-                reject(err);
-            });
+    assignRole: function (_model, roleName) {
+        var Model = sails.models[_model.identity];
+        return Promise.all([
+            Model.findOne({ id: _model.id }),
+            Role.findOne({ name: roleName })
+        ]).spread((model, role) => {
+            model.roles.add(role.id);
+            model.save();
+        }).catch((err) => reject(err));
+    },
+
+    setCreatedBy: function (model) {
+        var Model = sails.models[model.identity];
+        var promise = new Promise((resolve, reject) => {
+            if (sails.config.models.autoCreatedBy !== true) {
+                resolve();
+            }
+            Model.findOne({ id: model.id })
+                .then((model) => {
+                    model.createdBy = model.id;
+                    model.owner = model.id;
+                    model.save();
+                    resolve(model);
+                }).catch((err) => reject(err));
         });
         return promise;
     },

@@ -23,6 +23,10 @@ module.exports = {
       collection: 'User',
       via: 'roles'
     },
+    customers: {
+      collection: 'Customer',
+      via: 'roles'
+    },
     active: {
       type: 'boolean',
       defaultsTo: true,

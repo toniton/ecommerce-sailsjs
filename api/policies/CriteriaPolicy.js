@@ -7,7 +7,7 @@
 var wlFilter = require('waterline-criteria');
 var _ = require('lodash');
 
-module.exports = function(req, res, next) {
+module.exports = function (req, res, next) {
   var permissions = req.permissions;
 
   if (_.isEmpty(permissions)) {
@@ -31,7 +31,7 @@ module.exports = function(req, res, next) {
   // get all of the where clauses and blacklists into one flat array
   // if a permission has no criteria then it is always true
   var criteria = _.compact(_.flatten(
-    _.map(permissions, function(permission) {
+    _.map(permissions, function (permission) {
       if (_.isEmpty(permission.criteria)) {
         permission.criteria = [{
           where: {}
@@ -39,12 +39,13 @@ module.exports = function(req, res, next) {
       }
 
       var criteriaList = permission.criteria;
-      return _.map(criteriaList, function(criteria) {
+      return _.map(criteriaList, function (criteria) {
         // ensure criteria.where is initialized
         criteria.where = criteria.where || {};
 
         if (permission.relation == 'owner') {
-          criteria.where.owner = req.user.id;
+          // criteria.where.owner = req.user.id;
+          criteria.where.createdBy = req.user.id;
         }
 
         return criteria;
@@ -54,7 +55,7 @@ module.exports = function(req, res, next) {
 
 
   // set up response filters if we are not mutating an existing object
-  if (!_.contains(['update', 'delete'], action)) {
+  if (!_.includes(['update', 'delete'], action)) {
 
     if (criteria.length) {
       bindResponsePolicy(req, res, criteria);
@@ -63,7 +64,7 @@ module.exports = function(req, res, next) {
   }
 
   PermissionService.findTargetObjects(req)
-    .then(function(objects) {
+    .then(function (objects) {
 
       // attributes are not important for a delete request
       if (action === 'delete') {
@@ -91,7 +92,6 @@ function bindResponsePolicy(req, res, criteria) {
 }
 
 function responsePolicy(criteria, _data, options) {
-  sails.log.info('responsePolicy');
   var req = this.req;
   var res = this.res;
   var user = req.owner;
@@ -100,12 +100,11 @@ function responsePolicy(criteria, _data, options) {
 
   var data = isResponseArray ? _data : [_data];
 
-  sails.log.silly('data', data);
-  sails.log.silly('options', options);
-  sails.log.silly('criteria!', criteria);
+  // remove undefined, since that is invalid input for waterline-criteria
+  data = data.filter((item) => { return item !== undefined; });
 
-  var permitted = data.reduce(function(memo, item) {
-    criteria.some(function(crit) {
+  var permitted = data.reduce(function (memo, item) {
+    criteria.some(function (crit) {
       var filtered = wlFilter([item], {
         where: {
           or: [crit.where]
@@ -115,7 +114,7 @@ function responsePolicy(criteria, _data, options) {
       if (filtered.length) {
 
         if (crit.blacklist && crit.blacklist.length) {
-          crit.blacklist.forEach(function(term) {
+          crit.blacklist.forEach(function (term) {
             delete item[term];
           });
         }
@@ -125,13 +124,13 @@ function responsePolicy(criteria, _data, options) {
     });
     return memo;
   }, []);
-
+  
   if (isResponseArray) {
     return res._ok(permitted, options);
   } else if (permitted.length === 0) {
     sails.log.silly('permitted.length === 0');
     return res.forbidden({
-        error: 'Cannot perform action [read] on foreign object'
+      error: 'Cannot perform action [read] on foreign object'
     });
   } else {
     res._ok(permitted[0], options);
