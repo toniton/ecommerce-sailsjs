@@ -7,7 +7,7 @@
 var actionUtil = require('sails/lib/hooks/blueprints/actionUtil');
 var bcrypt = require('bcrypt-nodejs');
 var Promise = require('bluebird');
-var ObjectId = require('mongodb').ObjectID;
+var ObjectId = require('sails-mongo/node_modules/mongodb').ObjectID;
 
 module.exports = {
     upload: function (req, res) {
@@ -95,20 +95,19 @@ module.exports = {
                                     }
                                 },
                                 { $count: "products" }
-                            ],
-                                function (err, response) {
-                                    if (err) {
-                                        reject(err);
-                                    }
-                                    if (typeof(response) === 'undefined') {
-                                        category.productCount = 0;
-                                    } else if (response && response.length !== 1) {
-                                        category.productCount = 0;
-                                    } else if (response && response[0] && response[0].products) {
-                                        category.productCount = response[0].products;
-                                    }
-                                    resolve(category);
+                            ]).toArray((err, response) => {
+                                if (err) {
+                                    reject(err);
                                 }
+                                if (typeof (response) === 'undefined') {
+                                    category.productCount = 0;
+                                } else if (response && response.length !== 1) {
+                                    category.productCount = 0;
+                                } else if (response && response[0] && response[0].products) {
+                                    category.productCount = response[0].products;
+                                }
+                                resolve(category);
+                            }
                             );
                         });
                     });
@@ -123,8 +122,10 @@ module.exports = {
         Category.findOne({ id: reqData.id }).populate('children')
             .then((category) => {
                 return new Promise((resolve, reject) => {
+                    if (!category) return reject(null);
+
                     Product.native((err, collection) => {
-                        if (err) return res.serverError(err);
+                        if (err) reject(err);
 
                         collection.aggregate([
                             {
@@ -152,7 +153,7 @@ module.exports = {
                                 if (err) {
                                     reject(err);
                                 }
-                                if (typeof(response) === 'undefined') {
+                                if (typeof (response) === 'undefined') {
                                     category.productCount = 0;
                                 } else if (response && response.length !== 1) {
                                     category.productCount = 0;
