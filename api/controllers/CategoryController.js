@@ -67,7 +67,9 @@ module.exports = {
         if (reqData.id) {
             return this.findOne(req, res);
         }
-        Category.find({ "parent": null }).populate('children')
+        Category.find({ "parent": null })
+            .populate('children')
+            .populate('attributes')
             .then((data) => {
                 return Promise.map(data, (category) => {
                     return new Promise((resolve, reject) => {
@@ -119,7 +121,10 @@ module.exports = {
             id: 'string'
         });
         var reqData = actionUtil.parseValues(req);
-        Category.findOne({ id: reqData.id }).populate('children')
+        Category.findOne({ id: reqData.id })
+            .populate('children')
+            .populate('attributes')
+            .populate('products')
             .then((category) => {
                 return new Promise((resolve, reject) => {
                     if (!category) return reject(null);

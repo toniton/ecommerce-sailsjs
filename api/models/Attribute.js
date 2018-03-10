@@ -16,8 +16,12 @@ module.exports = {
     },
     dataType: {
       type: "string",
-      enum: ["integer","string","boolean","float"],
+      enum: ["integer", "string", "boolean", "float", "dropdown"],
       defaultsTo: "string"
+    },
+    options: {
+      type: "array",
+      defaultsTo: null
     },
     unit: {
       type: "string",
