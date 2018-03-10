@@ -26,6 +26,6 @@ module.exports = {
     defaults: {
     },
     jwtSettings: {
-        expiresInMinutes: "2 minutes"
+        expiresInMinutes: "15 minutes"
     }
 };
