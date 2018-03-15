@@ -67,7 +67,7 @@ module.exports = {
         if (reqData.id) {
             return this.findOne(req, res);
         }
-        Category.find({ "parent": null })
+        Category.find({ parent: null })
             .populate('children')
             .populate('attributes')
             .then((data) => {
@@ -129,7 +129,7 @@ module.exports = {
                 return new Promise((resolve, reject) => {
                     if (!category) return reject(null);
 
-                    Product.native((err, collection) => {
+                    category.productCount = Product.native((err, collection) => {
                         if (err) reject(err);
 
                         collection.aggregate([
@@ -153,21 +153,19 @@ module.exports = {
                                 }
                             },
                             { $count: "products" }
-                        ],
-                            function (err, response) {
-                                if (err) {
-                                    reject(err);
-                                }
-                                if (typeof (response) === 'undefined') {
-                                    category.productCount = 0;
-                                } else if (response && response.length !== 1) {
-                                    category.productCount = 0;
-                                } else if (response && response[0] && response[0].products) {
-                                    category.productCount = response[0].products;
-                                }
-                                resolve(category);
+                        ]).toArray((err, response) => {
+                            if (err) {
+                                reject(err);
                             }
-                        );
+                            if (typeof (response) === 'undefined') {
+                                category.productCount = 0;
+                            } else if (response && response.length !== 1) {
+                                category.productCount = 0;
+                            } else if (response && response[0] && response[0].products) {
+                                category.productCount = response[0].products;
+                            }
+                            resolve(category);
+                        });
                     });
                 }).then((category) => res.ok(category));
             }).catch((reason) => res.negotiate(reason));
