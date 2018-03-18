@@ -62,113 +62,32 @@ module.exports = {
             });
         }
     },
-    find: function (req, res) {
+    menu: function (req, res) {
         var reqData = actionUtil.parseValues(req);
         if (reqData.id) {
             return this.findOne(req, res);
         }
+
         Category.find({ parent: null })
             .populate('children')
             .populate('attributes')
             .then((data) => {
                 return Promise.map(data, (category) => {
                     return new Promise((resolve, reject) => {
-                        Product.native((err, collection) => {
-                            if (err) return res.serverError(err);
-
-                            collection.aggregate([
-                                {
-                                    $lookup: {
-                                        from: "category_products__product_categories",
-                                        localField: "_id",
-                                        foreignField: "product_categories",
-                                        as: "categories"
-                                    }
-                                },
-                                {
-                                    $project: {
-                                        categories: 1
-                                    }
-                                },
-                                { $unwind: "$categories" },
-                                {
-                                    $match: {
-                                        "categories.category_products": new ObjectId(category.id)
-                                    }
-                                },
-                                { $count: "products" }
-                            ]).toArray((err, response) => {
-                                if (err) {
-                                    reject(err);
-                                }
-                                if (typeof (response) === 'undefined') {
-                                    category.productCount = 0;
-                                } else if (response && response.length !== 1) {
-                                    category.productCount = 0;
-                                } else if (response && response[0] && response[0].products) {
-                                    category.productCount = response[0].products;
-                                }
-                                resolve(category);
-                            }
-                            );
-                        });
+                        Promise.all([
+                            sails.models['category_products__product_categories']
+                                .count({ category_products: category.id })
+                                .then((count) => (category.productCount = count)),
+                            Promise.map(category.children, (children) => {
+                                sails.models['category_products__product_categories']
+                                    .count({ category_products: children.id })
+                                    .then((count) => (children.productCount = count));
+                            })
+                        ]).then((results) => (sails.log.info, resolve(category)));
                     });
-                }).then((categories) => res.ok(categories));
-            }).catch((reason) => res.negotiate(reason));
-    },
-    findOne: function (req, res) {
-        req.validate({
-            id: 'string'
-        });
-        var reqData = actionUtil.parseValues(req);
-        Category.findOne({ id: reqData.id })
-            .populate('children')
-            .populate('attributes')
-            .populate('products')
-            .then((category) => {
-                return new Promise((resolve, reject) => {
-                    if (!category) return reject(null);
-
-                    category.productCount = Product.native((err, collection) => {
-                        if (err) reject(err);
-
-                        collection.aggregate([
-                            {
-                                $lookup: {
-                                    from: "category_products__product_categories",
-                                    localField: "_id",
-                                    foreignField: "product_categories",
-                                    as: "categories"
-                                }
-                            },
-                            {
-                                $project: {
-                                    categories: 1
-                                }
-                            },
-                            { $unwind: "$categories" },
-                            {
-                                $match: {
-                                    "categories.category_products": new ObjectId(category.id)
-                                }
-                            },
-                            { $count: "products" }
-                        ]).toArray((err, response) => {
-                            if (err) {
-                                reject(err);
-                            }
-                            if (typeof (response) === 'undefined') {
-                                category.productCount = 0;
-                            } else if (response && response.length !== 1) {
-                                category.productCount = 0;
-                            } else if (response && response[0] && response[0].products) {
-                                category.productCount = response[0].products;
-                            }
-                            resolve(category);
-                        });
-                    });
-                }).then((category) => res.ok(category));
-            }).catch((reason) => res.negotiate(reason));
+                });
+            }).then(res.ok)
+            .catch(res.negotiate);
     }
 };
 

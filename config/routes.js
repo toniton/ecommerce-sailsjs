@@ -75,16 +75,4 @@ module.exports.routes = {
   "PUT /api/user/newpassword/:id": {response: 'forbidden'},
   "DELETE /api/user/newpassword/:id": {response: 'forbidden'},
 
-  "GET /api/transaction/response": {response: 'forbidden'},
-  "GET /api/transaction/response/:id": {response: 'forbidden'},
-  "PUT /api/transaction/response": {response: 'forbidden'},
-  "PUT /api/transaction/response/:id": {response: 'forbidden'},
-  "DELETE /api/transaction/response/:id": {response: 'forbidden'},
-
-  "GET /api/bankaccount/verify": {response: 'forbidden'},
-  "GET /api/bankaccount/verify/:id": {response: 'forbidden'},
-  "PUT /api/bankaccount/verify": {response: 'forbidden'},
-  "PUT /api/bankaccount/verify/:id": {response: 'forbidden'},
-  "DELETE /api/bankaccount/verify/:id": {response: 'forbidden'},
-
 };

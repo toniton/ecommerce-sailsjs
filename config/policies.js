@@ -42,6 +42,8 @@ module.exports.policies = {
   CategoryController: {
     'find': true,
     'findOne': true,
+    'menu': true,
+    'populate': true,
     'banner': true
   },
   ProductController: {
