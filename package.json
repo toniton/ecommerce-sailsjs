@@ -52,7 +52,7 @@
   },
   "scripts": {
     "debug": "node debug app.js",
-    "start": "node app.js",
+    "start": "NODE_ENV=production node app.js",
     "test": "NODE_ENV=test mocha test/bootstrap.test.js test/integration/**/*.test.js --reporter spec"
   },
   "main": "app.js",
