@@ -11,49 +11,58 @@ module.exports = {
     customer: {
       model: "customer"
     },
-    unit:{
+    unit: {
       type: "string",
-      enum: ["cm","inch",""]
+      enum: ["cm", "inch"],
+      defaultsTo: "cm"
     },
-    neck:{
+    neck: {
       type: "float",
     },
-    chest:{
+    chest: {
       type: "float",
     },
-    waist:{
+    waist: {
       type: "float",
     },
-    seat:{
+    seat: {
       type: "float",
     },
-    shirtLength:{
+    shirtLength: {
       type: "float",
     },
-    shoulderWidth:{
+    shoulderWidth: {
       type: "float",
     },
-    armLength:{
+    armLength: {
       type: "float",
     },
-    wrist:{
+    wrist: {
       type: "float",
     },
-    biceps:{
+    biceps: {
       type: "float",
     },
-    hip:{
+    hip: {
       type: "float",
     },
-    inseam:{
+    inseam: {
       type: "float",
     },
-    sleeveLength:{
+    sleeveLength: {
       type: "float",
     },
-    jacketLength:{
+    jacketLength: {
       type: "float",
     },
+    videoUrl: {
+      type: 'string',
+      defaultsTo: null
+    },
+    videoFd: {
+      type: 'string',
+      defaultsTo: null
+    }
   }
 };
 

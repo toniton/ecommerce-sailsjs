@@ -66,9 +66,9 @@ module.exports.connections = {
     adapter: 'sails-mongo',
     host: 'localhost',
     port: 28960,
-    user: 'toniton',
-    password: 'tofunmi18',
-    database: 'ecommerce'
+    user: 'admin',
+    password: 'p455w0rd',
+    database: 'taped_and_tailored'
   },
 
   /***************************************************************************
