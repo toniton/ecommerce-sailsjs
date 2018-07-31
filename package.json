@@ -1,9 +1,8 @@
 {
-  "name": "paytron-api",
+  "name": "ecommerce-api",
   "private": true,
   "version": "1.0.0",
-  "description": "The api backend for paytron.com.ng",
-  "url": "http://paytron.com.ng",
+  "description": "The api backend for nodejs ecommerce",
   "keywords": [],
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",

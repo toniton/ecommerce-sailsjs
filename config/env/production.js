@@ -37,7 +37,7 @@ module.exports = {
     // }
 
     hookTimeout: 1200000,
-    port: 8085,
+    port: process.env.PORT || 80,
     tokenSecret: "4ukI0uIVnB3iI1yxj646fVXSE3ZVk4doZgz6fTbNg7jO41EAtl20J5F7Trtwe7OM",
     defaults: {
     },
